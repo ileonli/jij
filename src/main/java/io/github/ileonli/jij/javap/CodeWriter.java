@@ -2,12 +2,13 @@ package io.github.ileonli.jij.javap;
 
 import io.github.ileonli.jij.classfile.*;
 import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
+import io.github.ileonli.jij.classfile.attribute.LineNumberTableAttribute;
 
 import java.io.IOException;
 import java.util.List;
 
 public class CodeWriter extends BasicWriter {
-    public void writeInstr(Instruction instr, ConstantPool cp) throws IOException {
+    public void writeInstr(Instruction instr, ConstantPool cp) {
         print(String.format("%4d: %-13s ", instr.PC(), instr.opcode.toMnemonic()));
         // compute the number of indentations for the body of multi-line instructions
         // This is 6 (the width of "%4d: "), divided by the width of each indentation level,
@@ -93,14 +94,10 @@ public class CodeWriter extends BasicWriter {
     }
 
     public void write(CodeAttribute code, ConstantPool cp) {
-        List<Instruction> instructions = code.toInstructions();
         indent(3);
-        try {
-            for (Instruction instruction : instructions) {
-                writeInstr(instruction, cp);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        List<Instruction> instructions = code.toInstructions();
+        for (Instruction instruction : instructions) {
+            writeInstr(instruction, cp);
         }
         indent(-3);
     }
