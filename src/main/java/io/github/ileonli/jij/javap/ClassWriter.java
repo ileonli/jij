@@ -4,7 +4,11 @@ import io.github.ileonli.jij.classfile.AccessFlags;
 import io.github.ileonli.jij.classfile.ClassFile;
 import io.github.ileonli.jij.classfile.Method;
 import io.github.ileonli.jij.classfile.Methods;
+import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
+import io.github.ileonli.jij.classfile.attribute.ExceptionsAttribute;
 import io.github.ileonli.jij.classfile.attribute.SourceFileAttribute;
+import io.github.ileonli.jij.classfile.cp.ConstantClassInfo;
+import io.github.ileonli.jij.classfile.exception.InvalidDescriptorException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,11 +18,13 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
 public class ClassWriter extends BasicWriter {
     private final ConstantPoolWriter poolWriter;
+    private final CodeWriter codeWriter;
 
     public ClassWriter(ClassFile cf) {
         this(cf, 0);
@@ -27,6 +33,7 @@ public class ClassWriter extends BasicWriter {
     public ClassWriter(ClassFile cf, int indentWidth) {
         super(INDEX_WIDTH, indentWidth);
         this.poolWriter = new ConstantPoolWriter(cf.constant_pool);
+        this.codeWriter = new CodeWriter();
     }
 
 
@@ -119,13 +126,61 @@ public class ClassWriter extends BasicWriter {
         poolWriter.write(cf.constant_pool);
     }
 
+    private void writeMethod(ClassFile cf, Method method) {
+        String returnType, parameterTypes;
+        int parameterSize = 0;
+        try {
+            returnType = method.descriptor.getReturnType();
+            parameterTypes = method.descriptor.getParameterTypes();
+            parameterSize = method.descriptor.getParameterSize();
+        } catch (InvalidDescriptorException e) {
+            returnType = "???";
+            parameterTypes = "???";
+        }
+
+        indent(1);
+        Set<String> modifiers = method.access_flags.getMethodModifiers();
+        println(String.join(" ", modifiers) + " " + returnType);
+
+        String methodName = method.getName();
+        switch (methodName) {
+            case "<init>" -> methodName = cf.thisClassName();
+            case "<clinit>" -> print("{}");
+        }
+        print(" " + methodName + parameterTypes);
+
+        ExceptionsAttribute exceptions = method.attributes.getAttribute(ExceptionsAttribute.class);
+        if (exceptions != null) {
+            print(" throws ");
+            ConstantClassInfo[] ccis = exceptions.getExceptions();
+            print(String.join(", ", Arrays.stream(ccis).map(ConstantClassInfo::getName).toList()) + ";");
+        }
+        println();
+
+        indent(1);
+        println("descriptor: " + method.descriptor.descriptor);
+
+        AccessFlags accessFlags = method.access_flags;
+        println("flags: " + "(" + String.format("0x%04x", accessFlags.flags) + ")" + " " +
+                String.join(", ", accessFlags.getMethodFlags()));
+        println("Code:");
+        CodeAttribute attr = method.attributes.getAttribute(CodeAttribute.class);
+
+        indent(1);
+        println("stack=" + attr.max_stack +
+                ", locals=" + attr.max_locals +
+                ", args_size=" + parameterSize);
+        indent(-1);
+
+        codeWriter.write(attr, cf.constant_pool);
+        indent(-2);
+    }
+
     private void writeMethods(ClassFile cf) {
         println("{");
         Methods methods = cf.methods;
-
-        MethodWriter methodWriter = new MethodWriter(cf);
         methods.forEach((idx, method) -> {
-            methodWriter.write(method);
+            writeMethod(cf, method);
             if (idx != methods.length() - 1) println();
         });
         println("}");
