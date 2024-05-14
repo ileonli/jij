@@ -5,7 +5,6 @@ import io.github.ileonli.jij.classfile.attribute.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class Attributes {
 
@@ -70,19 +69,17 @@ public class Attributes {
     }
 
     private static Attribute getAttribute(ClassReader cr, String type) throws IOException {
-        Attribute attribute;
-        switch (type) {
-            case Code -> attribute = new CodeAttribute(cr);
-            case ConstantValue -> attribute = new ConstantValueAttribute(cr);
-            case Exceptions -> attribute = new ExceptionsAttribute(cr);
-            case InnerClasses -> attribute = new InnerClassesAttribute(cr);
-            case LineNumberTable -> attribute = new LineNumberTableAttribute(cr);
-            case Signature -> attribute = new SignatureAttribute(cr);
-            case SourceFile -> attribute = new SourceFileAttribute(cr);
-            case StackMapTable -> attribute = new StackMapTableAttribute(cr);
+        return switch (type) {
+            case Code -> new CodeAttribute(cr);
+            case ConstantValue -> new ConstantValueAttribute(cr);
+            case Exceptions -> new ExceptionsAttribute(cr);
+            case InnerClasses -> new InnerClassesAttribute(cr);
+            case LineNumberTable -> new LineNumberTableAttribute(cr);
+            case Signature -> new SignatureAttribute(cr);
+            case SourceFile -> new SourceFileAttribute(cr);
+            case StackMapTable -> new StackMapTableAttribute(cr);
             default -> throw new IllegalArgumentException("Illegal attribute type: " + type);
-        }
-        return attribute;
+        };
     }
 
     public <T> T getAttribute(Class<T> type) {
