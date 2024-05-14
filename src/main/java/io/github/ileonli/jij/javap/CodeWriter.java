@@ -4,7 +4,6 @@ import io.github.ileonli.jij.classfile.*;
 import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
 import io.github.ileonli.jij.classfile.attribute.LineNumberTableAttribute;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CodeWriter extends BasicWriter {
@@ -93,12 +92,27 @@ public class CodeWriter extends BasicWriter {
         println();
     }
 
+    public void writeLineNumberTable(LineNumberTableAttribute lnta) {
+        println("LineNumberTable:");
+        for (var table : lnta.line_number_tables) {
+            indent(1);
+            println("line " + table.line_number + ": " + table.start_pc);
+            indent(-1);
+        }
+    }
+
     public void write(CodeAttribute code, ConstantPool cp) {
         indent(3);
         List<Instruction> instructions = code.toInstructions();
         for (Instruction instruction : instructions) {
             writeInstr(instruction, cp);
         }
+
+        Attributes attributes = code.attributes;
+
+        LineNumberTableAttribute lnta = attributes.getAttribute(LineNumberTableAttribute.class);
+        writeLineNumberTable(lnta);
+
         indent(-3);
     }
 }
