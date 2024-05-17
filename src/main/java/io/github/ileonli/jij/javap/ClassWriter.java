@@ -186,10 +186,6 @@ public class ClassWriter extends BasicWriter {
         println("}");
     }
 
-    public String getJavaName(String name) {
-        return name.replace('/', '.');
-    }
-
     public void write(ClassFile cf) {
         writeClassfile(cf);
         writeClassInfo(cf);
