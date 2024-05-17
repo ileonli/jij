@@ -104,6 +104,13 @@ public class StackMapTableAttribute extends Attribute {
         public StackMapFrame(int frame_type) {
             this.frame_type = frame_type;
         }
+
+        public String name() {
+            return this.getClass().getSimpleName()
+                    .replace("_frame_extended", "")
+                    .replace("_frame", "");
+        }
+
     }
 
     public static class same_frame extends StackMapFrame {
