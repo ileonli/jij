@@ -1,5 +1,7 @@
 package io.github.ileonli.jij.classfile;
 
+import java.util.Objects;
+
 public class ClassFileUtils {
     /* If name is a valid binary name, return it; otherwise quote it. */
     public static String checkName(String name) {
@@ -48,5 +50,10 @@ public class ClassFileUtils {
         if (nextk < len)
             buf.append(name, nextk, len);
         return buf.toString();
+    }
+
+    public static String getJavaName(String name) {
+        Objects.requireNonNull(name);
+        return name.replace('/', '.');
     }
 }
