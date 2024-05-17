@@ -1,9 +1,6 @@
 package io.github.ileonli.jij.javap;
 
-import io.github.ileonli.jij.classfile.AccessFlags;
-import io.github.ileonli.jij.classfile.ClassFile;
-import io.github.ileonli.jij.classfile.Method;
-import io.github.ileonli.jij.classfile.Methods;
+import io.github.ileonli.jij.classfile.*;
 import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
 import io.github.ileonli.jij.classfile.attribute.ExceptionsAttribute;
 import io.github.ileonli.jij.classfile.attribute.SourceFileAttribute;
@@ -149,11 +146,15 @@ public class ClassWriter extends BasicWriter {
         }
         print(" " + methodName + parameterTypes);
 
+        String exceptionString = "";
         ExceptionsAttribute exceptions = method.attributes.getAttribute(ExceptionsAttribute.class);
         if (exceptions != null) {
             print(" throws ");
             ConstantClassInfo[] ccis = exceptions.getExceptions();
-            print(String.join(", ", Arrays.stream(ccis).map(ConstantClassInfo::getName).toList()) + ";");
+            exceptionString = String.join(", ",
+                    Arrays.stream(ccis).map(e -> ClassFileUtils.getJavaName(e.getName())).toList()
+            ) + ";";
+            print(exceptionString);
         }
         println();
 
@@ -173,6 +174,14 @@ public class ClassWriter extends BasicWriter {
         indent(-1);
 
         codeWriter.write(attr, cf.constant_pool);
+
+        if (exceptions != null) {
+            println("Exceptions:");
+            indent(1);
+            println("throws " + exceptionString);
+            indent(-1);
+        }
+
         indent(-2);
     }
 
