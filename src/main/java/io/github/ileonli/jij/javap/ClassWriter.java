@@ -194,7 +194,7 @@ public class ClassWriter extends BasicWriter {
         println("descriptor: " + method.descriptor.descriptor);
 
         AccessFlags accessFlags = method.access_flags;
-        println("flags: " + "(" + String.format("0x%04x", accessFlags.flags) + ")" + " " +
+        println("flags: " + String.format("(0x%04x)", accessFlags.flags) + " " +
                 String.join(", ", accessFlags.getMethodFlags()));
         println("Code:");
         CodeAttribute attr = method.attributes.getAttribute(CodeAttribute.class);
