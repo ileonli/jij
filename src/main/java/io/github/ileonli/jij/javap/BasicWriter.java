@@ -8,7 +8,6 @@ public abstract class BasicWriter {
 
     private final int indentWidth;
     private int indentCount;
-    private boolean pendingNewline;
 
     private final StringBuilder buffer;
     private final PrintWriter writer;
@@ -44,10 +43,6 @@ public abstract class BasicWriter {
         space(indentCount * indentWidth);
     }
 
-    public void setPendingNewline(boolean b) {
-        pendingNewline = b;
-    }
-
     public void tab() {
         if (buffer.isEmpty()) indent();
         space(indentCount * indentWidth + TAB_COLUMN - buffer.length());
@@ -62,10 +57,6 @@ public abstract class BasicWriter {
     }
 
     public void print(String s) {
-        if (pendingNewline) {
-            println();
-            pendingNewline = false;
-        }
         if (s == null) s = "null";
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
