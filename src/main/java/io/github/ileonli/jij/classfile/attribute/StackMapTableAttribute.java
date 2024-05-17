@@ -61,6 +61,21 @@ public class StackMapTableAttribute extends Attribute {
         public VerificationTypeInfo(int tag) {
             this.tag = tag;
         }
+
+        public String tagToString() {
+            return switch (tag) {
+                case VerificationTypeInfo.ITEM_Top -> "top";
+                case VerificationTypeInfo.ITEM_Integer -> "int";
+                case VerificationTypeInfo.ITEM_Float -> "float";
+                case VerificationTypeInfo.ITEM_Long -> "long";
+                case VerificationTypeInfo.ITEM_Double -> "double";
+                case VerificationTypeInfo.ITEM_Null -> "null";
+                case VerificationTypeInfo.ITEM_UninitializedThis -> "uninitializedThis";
+                case VerificationTypeInfo.ITEM_Object -> "object";
+                case VerificationTypeInfo.ITEM_Uninitialized -> "uninitialized";
+                default -> throw new IllegalArgumentException("Unknown tag: " + tag);
+            };
+        }
     }
 
     public static class ObjectVariableInfo extends VerificationTypeInfo {
