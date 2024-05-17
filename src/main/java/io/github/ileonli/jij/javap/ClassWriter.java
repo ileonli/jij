@@ -57,6 +57,11 @@ public class ClassWriter extends BasicWriter {
         }
     }
 
+    private String getSourceFileName(ClassFile cf) {
+        SourceFileAttribute sourceFileAttribute = cf.getAttribute(SourceFileAttribute.class);
+        return sourceFileAttribute.getSourceFileName();
+    }
+
     private void writeClassfile(ClassFile cf) {
         println("Classfile " + cf.path.toString());
         indent(1);
@@ -76,8 +81,7 @@ public class ClassWriter extends BasicWriter {
 
         println("SHA-256 checksum " + checksum(cf.path));
 
-        SourceFileAttribute sourceFileAttribute = cf.getAttribute(SourceFileAttribute.class);
-        println("Compiled from " + sourceFileAttribute.getSourceFileName());
+        println("Compiled from " + getSourceFileName(cf));
         indent(-1);
     }
 
@@ -137,7 +141,7 @@ public class ClassWriter extends BasicWriter {
 
         indent(1);
         Set<String> modifiers = method.access_flags.getMethodModifiers();
-        println(String.join(" ", modifiers) + " " + returnType);
+        print(String.join(" ", modifiers) + " " + returnType);
 
         String methodName = method.getName();
         switch (methodName) {
@@ -186,19 +190,23 @@ public class ClassWriter extends BasicWriter {
     }
 
     private void writeMethods(ClassFile cf) {
-        println("{");
         Methods methods = cf.methods;
         methods.forEach((idx, method) -> {
             writeMethod(cf, method);
             if (idx != methods.length() - 1) println();
         });
-        println("}");
     }
 
     public void write(ClassFile cf) {
         writeClassfile(cf);
         writeClassInfo(cf);
         writeConstantPool(cf);
+
+        println("{");
+        writeFields(cf);
         writeMethods(cf);
+        println("}");
+
+        println(String.format("SourceFile: \"%s\"", getSourceFileName(cf)));
     }
 }
