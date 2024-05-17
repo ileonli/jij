@@ -6,8 +6,8 @@ import io.github.ileonli.jij.classfile.ClassReader;
 import java.io.IOException;
 
 public class StackMapTableAttribute extends Attribute {
-    private final int number_of_entries;
-    private final StackMapFrame[] entries;
+    public final int number_of_entries;
+    public final StackMapFrame[] entries;
 
     public StackMapTableAttribute(ClassReader cr) throws IOException {
         super(cr);
@@ -58,7 +58,7 @@ public class StackMapTableAttribute extends Attribute {
 
         public final int tag;
 
-        public VerificationTypeInfo(int tag) throws IOException {
+        public VerificationTypeInfo(int tag) {
             this.tag = tag;
         }
     }
@@ -86,13 +86,13 @@ public class StackMapTableAttribute extends Attribute {
     public static class StackMapFrame {
         public final int frame_type;
 
-        public StackMapFrame(int frame_type) throws IOException {
+        public StackMapFrame(int frame_type) {
             this.frame_type = frame_type;
         }
     }
 
     public static class same_frame extends StackMapFrame {
-        public same_frame(int frame_type) throws IOException {
+        public same_frame(int frame_type) {
             super(frame_type);
         }
     }
