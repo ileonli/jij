@@ -3,6 +3,7 @@ package io.github.ileonli.jij.javap;
 import io.github.ileonli.jij.classfile.*;
 import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
 import io.github.ileonli.jij.classfile.attribute.LineNumberTableAttribute;
+import io.github.ileonli.jij.classfile.attribute.StackMapTableAttribute;
 
 import java.util.List;
 
@@ -101,6 +102,29 @@ public class CodeWriter extends BasicWriter {
         }
     }
 
+    private void writeStackMapTable(StackMapTableAttribute smta) {
+        if (smta == null) {
+            return;
+        }
+
+        DefaultStackMapFrameVisitor dsmfv = new DefaultStackMapFrameVisitor();
+
+        println("StackMapTable: number_of_entries = " + smta.number_of_entries);
+        for (StackMapTableAttribute.StackMapFrame e : smta.entries) {
+            indent(1);
+            println("frame_type = " + e.frame_type + " /* " + e.name() + " */");
+            indent(1);
+            List<String> list = e.accept(dsmfv);
+            if (list != null) {
+                for (String s : list) {
+                    println(s);
+                }
+            }
+            indent(-1);
+            indent(-1);
+        }
+    }
+
     public void write(CodeAttribute code, ConstantPool cp) {
         indent(3);
         List<Instruction> instructions = code.toInstructions();
@@ -113,6 +137,8 @@ public class CodeWriter extends BasicWriter {
         LineNumberTableAttribute lnta = attributes.getAttribute(LineNumberTableAttribute.class);
         writeLineNumberTable(lnta);
 
+        StackMapTableAttribute smta = attributes.getAttribute(StackMapTableAttribute.class);
+        writeStackMapTable(smta);
         indent(-3);
     }
 }
