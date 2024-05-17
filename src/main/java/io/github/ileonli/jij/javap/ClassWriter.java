@@ -127,6 +127,34 @@ public class ClassWriter extends BasicWriter {
         poolWriter.write(cf.constant_pool);
     }
 
+    private void writeField(ClassFile cf, Field field) {
+        indent(1);
+        String fieldType;
+        try {
+            fieldType = field.descriptor.getFieldType();
+        } catch (InvalidDescriptorException e) {
+            fieldType = "???";
+        }
+        ConstantPool cp = cf.constant_pool;
+        String fieldName = cp.getUtf8Value(field.name_index);
+        println(fieldType + " " + fieldName);
+
+        indent(1);
+        println("descriptor: " + field.descriptor.descriptor);
+        println("flags: " + String.format("(0x%04x)", field.access_flags.flags));
+        indent(-1);
+
+        indent(-1);
+        println();
+    }
+
+    private void writeFields(ClassFile cf) {
+        Fields fields = cf.fields;
+        for (Field field : fields.fields) {
+            writeField(cf, field);
+        }
+    }
+
     private void writeMethod(ClassFile cf, Method method) {
         String returnType, parameterTypes;
         int parameterSize = 0;
