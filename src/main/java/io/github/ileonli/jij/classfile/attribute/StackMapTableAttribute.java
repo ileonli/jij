@@ -2,6 +2,7 @@ package io.github.ileonli.jij.classfile.attribute;
 
 import io.github.ileonli.jij.classfile.Attribute;
 import io.github.ileonli.jij.classfile.ClassReader;
+import io.github.ileonli.jij.classfile.StackMapFrameVisitor;
 
 import java.io.IOException;
 
@@ -111,6 +112,18 @@ public class StackMapTableAttribute extends Attribute {
                     .replace("_frame", "");
         }
 
+        public <R> R accept(StackMapFrameVisitor<R> v) {
+            return switch (this) {
+                case same_frame f -> v.visit_same_frame(f);
+                case same_locals_1_stack_item_frame f -> v.visit_same_locals_1_stack_item_frame(f);
+                case same_locals_1_stack_item_frame_extended f -> v.visit_same_locals_1_stack_item_frame_extended(f);
+                case chop_frame f -> v.visit_chop_frame(f);
+                case same_frame_extended f -> v.visit_same_frame_extended(f);
+                case append_frame f -> v.visit_append_frame(f);
+                case full_frame f -> v.visit_full_frame(f);
+                default -> throw new IllegalStateException("Unexpected value: " + this);
+            };
+        }
     }
 
     public static class same_frame extends StackMapFrame {
