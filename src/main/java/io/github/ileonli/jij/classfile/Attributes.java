@@ -75,6 +75,7 @@ public class Attributes {
             case Exceptions -> new ExceptionsAttribute(cr);
             case InnerClasses -> new InnerClassesAttribute(cr);
             case LineNumberTable -> new LineNumberTableAttribute(cr);
+            case LocalVariableTable -> new LocalVariableTableAttribute(cr);
             case Signature -> new SignatureAttribute(cr);
             case SourceFile -> new SourceFileAttribute(cr);
             case StackMapTable -> new StackMapTableAttribute(cr);
