@@ -22,6 +22,7 @@ import java.util.Set;
 public class ClassWriter extends BasicWriter {
     private final ConstantPoolWriter poolWriter;
     private final CodeWriter codeWriter;
+    private final ClassFile cf;
 
     public ClassWriter(ClassFile cf) {
         this(cf, 0);
@@ -29,6 +30,7 @@ public class ClassWriter extends BasicWriter {
 
     public ClassWriter(ClassFile cf, int indentWidth) {
         super(INDEX_WIDTH, indentWidth);
+        this.cf = cf;
         this.poolWriter = new ConstantPoolWriter(cf.constant_pool);
         this.codeWriter = new CodeWriter();
     }
@@ -225,7 +227,7 @@ public class ClassWriter extends BasicWriter {
         });
     }
 
-    public void write(ClassFile cf) {
+    public void write() {
         writeClassfile(cf);
         writeClassInfo(cf);
         writeConstantPool(cf);
