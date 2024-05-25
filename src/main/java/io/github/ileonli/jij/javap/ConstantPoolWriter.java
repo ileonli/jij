@@ -13,7 +13,7 @@ public class ConstantPoolWriter extends BasicWriter {
         this.cp = cp;
     }
 
-    public void writeInfo(ConstantPoolInfo info, int idx) {
+    public void writeInfo(ConstantPoolInfo info) {
         DefaultConstantPoolVisitor dcpv = new DefaultConstantPoolVisitor(cp);
 
         ConstantPoolVisitor<Void> v = new ConstantPoolVisitor<>() {
@@ -83,7 +83,7 @@ public class ConstantPoolWriter extends BasicWriter {
             public Void visitInterfaceMethodref(ConstantInterfaceMethodrefInfo info) {
                 print("#" + info.class_index + ".#" + info.name_and_type_index);
                 tab();
-                println("//  " + dcpv.visitInterfaceMethodref(info));
+                println("// " + dcpv.visitInterfaceMethodref(info));
                 return null;
             }
 
@@ -91,7 +91,7 @@ public class ConstantPoolWriter extends BasicWriter {
             public Void visitNameAndType(ConstantNameAndTypeInfo info) {
                 print("#" + info.name_index + ":#" + info.type_index);
                 tab();
-                println("//  " + dcpv.visitNameAndType(info));
+                println("// " + dcpv.visitNameAndType(info));
                 return null;
             }
 
@@ -154,7 +154,7 @@ public class ConstantPoolWriter extends BasicWriter {
         cp.forEach((idx, info) -> {
             print(String.format("%" + width + "s", ("#" + idx)));
             print(String.format(" = %-18s ", info.infoName()));
-            writeInfo(info, idx);
+            writeInfo(info);
         });
         indent(-1);
     }
