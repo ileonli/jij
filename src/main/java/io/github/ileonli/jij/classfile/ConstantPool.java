@@ -63,7 +63,11 @@ public class ConstantPool {
 
     private final ConstantPoolInfo[] pool;
 
+    private final ClassFile cf;
+
     public ConstantPool(ClassReader cr) throws IOException {
+        cf = cr.classFile;
+
         int count = cr.readUnsignedShort();
         pool = new ConstantPoolInfo[count];
 
@@ -100,6 +104,10 @@ public class ConstantPool {
 
     public int length() {
         return pool.length;
+    }
+
+    public ClassFile ownClassFile() {
+        return this.cf;
     }
 
     public void forEach(BiConsumer<Integer, ConstantPoolInfo> info) {
