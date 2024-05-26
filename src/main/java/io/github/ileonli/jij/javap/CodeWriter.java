@@ -3,6 +3,7 @@ package io.github.ileonli.jij.javap;
 import io.github.ileonli.jij.classfile.*;
 import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
 import io.github.ileonli.jij.classfile.attribute.LineNumberTableAttribute;
+import io.github.ileonli.jij.classfile.attribute.LocalVariableTableAttribute;
 import io.github.ileonli.jij.classfile.attribute.StackMapTableAttribute;
 
 import java.util.List;
@@ -125,6 +126,24 @@ public class CodeWriter extends BasicWriter {
         }
     }
 
+    private void writeLocalVariableTable(LocalVariableTableAttribute lvta, ConstantPool cp) {
+        if (lvta == null) {
+            return;
+        }
+
+        println("LocalVariableTable:");
+        LocalVariableTableAttribute.LocalVariableTable[] tables = lvta.local_variable_tables;
+
+        indent(1);
+        println("Start  Length  Slot  Name   Signature");
+        for (LocalVariableTableAttribute.LocalVariableTable table : tables) {
+            println(String.format("%5d %7d %5d %5s   %s",
+                    table.start_pc, table.length, table.index,
+                    cp.getUtf8Value(table.name_index), cp.getUtf8Value(table.descriptor_index)));
+        }
+        indent(-1);
+    }
+
     public void write(CodeAttribute code, ConstantPool cp) {
         indent(3);
         List<Instruction> instructions = code.toInstructions();
@@ -139,6 +158,10 @@ public class CodeWriter extends BasicWriter {
 
         StackMapTableAttribute smta = attributes.getAttribute(StackMapTableAttribute.class);
         writeStackMapTable(smta);
+
+        LocalVariableTableAttribute lvta = attributes.getAttribute(LocalVariableTableAttribute.class);
+        writeLocalVariableTable(lvta, cp);
+
         indent(-3);
     }
 }
