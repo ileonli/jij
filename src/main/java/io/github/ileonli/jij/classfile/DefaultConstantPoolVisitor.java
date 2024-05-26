@@ -8,9 +8,15 @@ import static io.github.ileonli.jij.classfile.ClassFileUtils.checkName;
 
 public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
     private final ConstantPool cp;
+    private final boolean forInstruction;
 
     public DefaultConstantPoolVisitor(ConstantPool cp) {
+        this(cp, false);
+    }
+
+    public DefaultConstantPoolVisitor(ConstantPool cp, boolean forInstruction) {
         this.cp = cp;
+        this.forInstruction = forInstruction;
     }
 
     public String visitNameAndTypeInfo(ConstantNameAndTypeInfo nat) {
@@ -19,14 +25,22 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
         return checkName(name) + ":" + type;
     }
 
-    public String visitRefInfo(ConstantClassInfo clazz, ConstantNameAndTypeInfo nat) {
+    public String visitRefInfo(ConstantClassInfo clazz, ConstantNameAndTypeInfo nat, boolean simplify) {
         String nameAndType = visitNameAndTypeInfo(nat);
+        if (forInstruction && simplify) {
+            // simplify references within this class for instruction
+            return nameAndType;
+        }
         return clazz.getName() + "." + nameAndType;
     }
 
     public <T> T visitConstantPoolInfo(int idx, Function<ConstantPoolInfo, T> action) {
         ConstantPoolInfo info = cp.getConstantPoolInfo(idx);
         return action.apply(info);
+    }
+
+    private boolean withInClass(int class_index) {
+        return class_index == cp.ownClassFile().this_class;
     }
 
     @Override
@@ -78,17 +92,17 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
 
     @Override
     public String visitFieldref(ConstantFieldrefInfo info) {
-        return visitRefInfo(info.getClassInfo(), info.getNameAndTypeInfo());
+        return visitRefInfo(info.getClassInfo(), info.getNameAndTypeInfo(), withInClass(info.class_index));
     }
 
     @Override
     public String visitMethodref(ConstantMethodrefInfo info) {
-        return visitRefInfo(info.getClassInfo(), info.getNameAndTypeInfo());
+        return visitRefInfo(info.getClassInfo(), info.getNameAndTypeInfo(), withInClass(info.class_index));
     }
 
     @Override
     public String visitInterfaceMethodref(ConstantInterfaceMethodrefInfo info) {
-        return visitRefInfo(info.getClassInfo(), info.getNameAndTypeInfo());
+        return visitRefInfo(info.getClassInfo(), info.getNameAndTypeInfo(), withInClass(info.class_index));
     }
 
     @Override
@@ -103,11 +117,11 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
         return switch (info.reference_kind) {
             case REF_getField, REF_getStatic, REF_putField, REF_putStatic -> {
                 ConstantFieldrefInfo cfr = cp.getConstantPoolInfo(referenceIndex, ConstantFieldrefInfo.class);
-                yield visitRefInfo(cfr.getClassInfo(), cfr.getNameAndTypeInfo());
+                yield visitRefInfo(cfr.getClassInfo(), cfr.getNameAndTypeInfo(), withInClass(cfr.class_index));
             }
             case REF_invokeVirtual, REF_newInvokeSpecial -> {
                 ConstantMethodrefInfo cmr = cp.getConstantPoolInfo(referenceIndex, ConstantMethodrefInfo.class);
-                yield visitRefInfo(cmr.getClassInfo(), cmr.getNameAndTypeInfo());
+                yield visitRefInfo(cmr.getClassInfo(), cmr.getNameAndTypeInfo(), withInClass(cmr.class_index));
             }
             case REF_invokeStatic, REF_invokeSpecial -> {
                 // TODO: handle two types
@@ -116,7 +130,7 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
             case REF_invokeInterface -> {
                 ConstantInterfaceMethodrefInfo cim
                         = cp.getConstantPoolInfo(referenceIndex, ConstantInterfaceMethodrefInfo.class);
-                yield visitRefInfo(cim.getClassInfo(), cim.getNameAndTypeInfo());
+                yield visitRefInfo(cim.getClassInfo(), cim.getNameAndTypeInfo(), withInClass(cim.class_index));
             }
         };
     }

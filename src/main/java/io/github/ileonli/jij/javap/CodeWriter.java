@@ -18,7 +18,7 @@ public class CodeWriter extends BasicWriter {
         int indent = (6 + indentWidth - 1) / indentWidth;
 
         DefaultInstructionVisitor div = new DefaultInstructionVisitor(
-                new DefaultConstantPoolVisitor(cp), indent);
+                new DefaultConstantPoolVisitor(cp, true), indent);
 
         instr.accept(new InstructionVisitor<>() {
             @Override
