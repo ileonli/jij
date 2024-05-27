@@ -84,6 +84,23 @@ public abstract class BasicWriter {
     }
 
     public void println() {
+        // remove pending spaces
+        int length = buffer.length();
+        int spaceStart = length, spaceEnd = length;
+        for (int i = length - 1; i >= 0; i--) {
+            char c = buffer.charAt(i);
+            if (c == '\n') {
+                spaceEnd--;
+            } else if (c == ' ') {
+                spaceStart = i;
+            } else {
+                break;
+            }
+        }
+        if (spaceEnd < spaceStart) {
+            buffer.delete(spaceStart, spaceEnd + 1);
+        }
+
         writer.println(buffer);
         buffer.setLength(0);
     }
