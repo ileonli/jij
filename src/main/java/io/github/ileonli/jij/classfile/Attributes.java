@@ -81,6 +81,7 @@ public class Attributes {
             case Signature -> new SignatureAttribute(cr);
             case SourceFile -> new SourceFileAttribute(cr);
             case StackMapTable -> new StackMapTableAttribute(cr);
+            case Synthetic -> new SyntheticAttribute(cr);
             default -> throw new IllegalArgumentException("Illegal attribute type: " + type);
         };
     }
