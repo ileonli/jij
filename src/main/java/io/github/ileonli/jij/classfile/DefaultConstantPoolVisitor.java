@@ -124,8 +124,9 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
                 yield visitRefInfo(cmr.getClassInfo(), cmr.getNameAndTypeInfo(), withInClass(cmr.class_index));
             }
             case REF_invokeStatic, REF_invokeSpecial -> {
-                // TODO: handle two types
-                yield "???";
+                ConstantMethodrefInfo cmr = cp.getConstantPoolInfo(referenceIndex, ConstantMethodrefInfo.class);
+                yield info.reference_kind + " " +
+                        visitRefInfo(cmr.getClassInfo(), cmr.getNameAndTypeInfo(), withInClass(cmr.class_index));
             }
             case REF_invokeInterface -> {
                 ConstantInterfaceMethodrefInfo cim
