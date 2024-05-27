@@ -97,7 +97,7 @@ public abstract class BasicWriter {
                 break;
             }
         }
-        if (spaceEnd < spaceStart) {
+        if (spaceStart < spaceEnd) {
             buffer.delete(spaceStart, spaceEnd + 1);
         }
 
