@@ -72,6 +72,7 @@ public class Attributes {
         return switch (type) {
             case Code -> new CodeAttribute(cr);
             case ConstantValue -> new ConstantValueAttribute(cr);
+            case Deprecated -> new DeprecatedAttribute(cr);
             case EnclosingMethod -> new EnclosingMethodAttribute(cr);
             case Exceptions -> new ExceptionsAttribute(cr);
             case InnerClasses -> new InnerClassesAttribute(cr);
