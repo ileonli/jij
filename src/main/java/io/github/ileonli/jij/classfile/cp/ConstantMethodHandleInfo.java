@@ -14,7 +14,7 @@ public class ConstantMethodHandleInfo extends ConstantPoolInfo {
     public ConstantMethodHandleInfo(ConstantPool cp, ClassReader cr) throws IOException {
         super(cp);
         reference_kind = RefKind.valueFrom(cr.readUnsignedByte());
-        reference_index = cr.readUnsignedByte();
+        reference_index = cr.readUnsignedShort();
     }
 
 
