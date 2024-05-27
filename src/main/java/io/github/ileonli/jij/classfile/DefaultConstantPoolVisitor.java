@@ -47,14 +47,24 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
     public String visitUtf8(ConstantUtf8Info info) {
         String s = info.value;
         StringBuilder sb = new StringBuilder();
-        char[] charArray = s.toCharArray();
-        for (char c : charArray) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
             switch (c) {
                 case '\t' -> sb.append('\\').append('t');
                 case '\n' -> sb.append('\\').append('n');
                 case '\r' -> sb.append('\\').append('r');
+                case '\b' -> sb.append('\\').append('b');
+                case '\f' -> sb.append('\\').append('f');
                 case '\"' -> sb.append('\\').append('\"');
-                default -> sb.append(c);
+                case '\'' -> sb.append('\\').append('\'');
+                case '\\' -> sb.append('\\').append('\\');
+                default -> {
+                    if (Character.isISOControl(c)) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                        break;
+                    }
+                    sb.append(c);
+                }
             }
         }
         return sb.toString();
@@ -87,7 +97,8 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
 
     @Override
     public String visitString(ConstantStringInfo info) {
-        return info.getString();
+        ConstantUtf8Info utf8 = cp.getConstantPoolInfo(info.string_index, ConstantUtf8Info.class);
+        return visitUtf8(utf8);
     }
 
     @Override
