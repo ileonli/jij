@@ -92,7 +92,7 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
 
     @Override
     public String visitClass(ConstantClassInfo info) {
-        return info.getName();
+        return ClassFileUtils.checkName(info.getName());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
     public String visitMethodHandle(ConstantMethodHandleInfo info) {
         int referenceIndex = info.reference_index;
         // charter 4.4.8
-        return switch (info.reference_kind) {
+        return info.reference_kind + " " + switch (info.reference_kind) {
             case REF_getField, REF_getStatic, REF_putField, REF_putStatic -> {
                 ConstantFieldrefInfo cfr = cp.getConstantPoolInfo(referenceIndex, ConstantFieldrefInfo.class);
                 yield visitRefInfo(cfr.getClassInfo(), cfr.getNameAndTypeInfo(), withInClass(cfr.class_index));
@@ -136,8 +136,7 @@ public class DefaultConstantPoolVisitor implements ConstantPoolVisitor<String> {
             }
             case REF_invokeStatic, REF_invokeSpecial -> {
                 ConstantMethodrefInfo cmr = cp.getConstantPoolInfo(referenceIndex, ConstantMethodrefInfo.class);
-                yield info.reference_kind + " " +
-                        visitRefInfo(cmr.getClassInfo(), cmr.getNameAndTypeInfo(), withInClass(cmr.class_index));
+                yield visitRefInfo(cmr.getClassInfo(), cmr.getNameAndTypeInfo(), withInClass(cmr.class_index));
             }
             case REF_invokeInterface -> {
                 ConstantInterfaceMethodrefInfo cim

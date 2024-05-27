@@ -97,7 +97,7 @@ public class ConstantPoolWriter extends BasicWriter {
 
             @Override
             public Void visitMethodHandle(ConstantMethodHandleInfo info) {
-                print("#" + info.reference_kind.kind + ":#" + info.reference_index);
+                print(info.reference_kind.kind + ":#" + info.reference_index);
                 tab();
                 println("// " + dcpv.visitMethodHandle(info));
                 return null;
@@ -107,7 +107,7 @@ public class ConstantPoolWriter extends BasicWriter {
             public Void visitMethodType(ConstantMethodTypeInfo info) {
                 print("#" + info.descriptor_index);
                 tab();
-                println("// " + dcpv.visitMethodType(info));
+                println("//  " + dcpv.visitMethodType(info));
                 return null;
             }
 
