@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 public class ClassWriter extends BasicWriter {
@@ -83,7 +84,7 @@ public class ClassWriter extends BasicWriter {
 
         println("SHA-256 checksum " + checksum(cf.path));
 
-        println("Compiled from " + getSourceFileName(cf));
+        println(String.format("Compiled from \"%s\"", getSourceFileName(cf)));
         indent(-1);
     }
 
@@ -95,7 +96,8 @@ public class ClassWriter extends BasicWriter {
         String thisClassName = cf.thisClassName();
         String superClassName = cf.superClassName();
 
-        println(String.join(" ", classModifiers) + (cf.isClass() ? " class " : " interface ") + thisClassName);
+        println(String.join(" ", classModifiers) +
+                (cf.isClass() ? " class " : " interface ") + ClassFileUtils.getJavaName(thisClassName));
 
         indent(1);
 
@@ -139,11 +141,12 @@ public class ClassWriter extends BasicWriter {
         }
         ConstantPool cp = cf.constant_pool;
         String fieldName = cp.getUtf8Value(field.name_index);
-        println(fieldType + " " + fieldName);
+        println(String.join(" ", field.access_flags.getMethodModifiers()) + " " + fieldType + " " + fieldName + ";");
 
         indent(1);
         println("descriptor: " + field.descriptor.descriptor);
-        println("flags: " + String.format("(0x%04x)", field.access_flags.flags));
+        println("flags: " + String.format("(0x%04x)", field.access_flags.flags) + " " +
+                String.join(", ", field.access_flags.getMethodFlags()));
         indent(-1);
 
         indent(-1);
@@ -161,9 +164,12 @@ public class ClassWriter extends BasicWriter {
         String returnType, parameterTypes;
         int parameterSize = 0;
         try {
-            returnType = method.descriptor.getReturnType();
-            parameterTypes = method.descriptor.getParameterTypes();
+            returnType = ClassFileUtils.getJavaName(method.descriptor.getReturnType());
+            parameterTypes = ClassFileUtils.getJavaName(method.descriptor.getParameterTypes());
             parameterSize = method.descriptor.getParameterSize();
+            if (!method.access_flags.is(AccessFlags.ACC_STATIC)) {
+                parameterSize++;  // for 'this'
+            }
         } catch (InvalidDescriptorException e) {
             returnType = "???";
             parameterTypes = "???";
@@ -171,11 +177,15 @@ public class ClassWriter extends BasicWriter {
 
         indent(1);
         Set<String> modifiers = method.access_flags.getMethodModifiers();
-        print(String.join(" ", modifiers) + " " + returnType);
+        print(String.join(" ", modifiers));
 
         String methodName = method.getName();
+        if (!Objects.equals(methodName, "<init>")) {
+            print(" " + returnType);
+        }
+
         switch (methodName) {
-            case "<init>" -> methodName = cf.thisClassName();
+            case "<init>" -> methodName = ClassFileUtils.getJavaName(cf.thisClassName());
             case "<clinit>" -> print("{}");
         }
         print(" " + methodName + parameterTypes);
@@ -187,8 +197,8 @@ public class ClassWriter extends BasicWriter {
             ConstantClassInfo[] ccis = exceptions.getExceptions();
             exceptionString = String.join(", ",
                     Arrays.stream(ccis).map(e -> ClassFileUtils.getJavaName(e.getName())).toList()
-            ) + ";";
-            print(exceptionString);
+            );
+            print(exceptionString + ";");
         }
         println();
 
