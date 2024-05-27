@@ -79,6 +79,7 @@ public class Attributes {
             case LocalVariableTable -> new LocalVariableTableAttribute(cr);
             case LocalVariableTypeTable -> new LocalVariableTypeTableAttribute(cr);
             case Signature -> new SignatureAttribute(cr);
+            case SourceDebugExtension -> new SourceDebugExtensionAttribute(cr);
             case SourceFile -> new SourceFileAttribute(cr);
             case StackMapTable -> new StackMapTableAttribute(cr);
             case Synthetic -> new SyntheticAttribute(cr);
