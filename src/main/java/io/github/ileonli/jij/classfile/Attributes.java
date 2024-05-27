@@ -70,6 +70,7 @@ public class Attributes {
 
     private static Attribute getAttribute(ClassReader cr, String type) throws IOException {
         return switch (type) {
+            case BootstrapMethods -> new BootstrapMethodsAttribute(cr);
             case Code -> new CodeAttribute(cr);
             case ConstantValue -> new ConstantValueAttribute(cr);
             case Deprecated -> new DeprecatedAttribute(cr);
