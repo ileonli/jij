@@ -1,6 +1,7 @@
 package io.github.ileonli.jij.classfile;
 
 import io.github.ileonli.jij.classfile.attribute.*;
+import io.github.ileonli.jij.classfile.exception.MethodParametersAttribute;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -80,6 +81,7 @@ public class Attributes {
             case LineNumberTable -> new LineNumberTableAttribute(cr);
             case LocalVariableTable -> new LocalVariableTableAttribute(cr);
             case LocalVariableTypeTable -> new LocalVariableTypeTableAttribute(cr);
+            case MethodParameters -> new MethodParametersAttribute(cr);
             case Signature -> new SignatureAttribute(cr);
             case SourceDebugExtension -> new SourceDebugExtensionAttribute(cr);
             case SourceFile -> new SourceFileAttribute(cr);
