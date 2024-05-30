@@ -3,7 +3,7 @@ package io.github.ileonli.jij.javap;
 import io.github.ileonli.jij.classfile.ConstantPool;
 import io.github.ileonli.jij.classfile.ConstantPoolInfo;
 import io.github.ileonli.jij.classfile.ConstantPoolVisitor;
-import io.github.ileonli.jij.classfile.DefaultConstantPoolVisitor;
+import io.github.ileonli.jij.classfile.visitor.DefaultConstantPoolVisitor;
 import io.github.ileonli.jij.classfile.cp.*;
 
 public class ConstantPoolWriter extends BasicWriter {

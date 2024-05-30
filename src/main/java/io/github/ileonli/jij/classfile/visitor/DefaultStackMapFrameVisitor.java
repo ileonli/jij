@@ -1,5 +1,6 @@
-package io.github.ileonli.jij.classfile;
+package io.github.ileonli.jij.classfile.visitor;
 
+import io.github.ileonli.jij.classfile.StackMapFrameVisitor;
 import io.github.ileonli.jij.classfile.attribute.StackMapTableAttribute;
 
 import java.util.Arrays;

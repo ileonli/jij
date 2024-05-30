@@ -1,4 +1,7 @@
-package io.github.ileonli.jij.classfile;
+package io.github.ileonli.jij.classfile.visitor;
+
+import io.github.ileonli.jij.classfile.Instruction;
+import io.github.ileonli.jij.classfile.InstructionVisitor;
 
 public class DefaultInstructionVisitor implements InstructionVisitor<String> {
     private final DefaultConstantPoolVisitor cpVisitor;

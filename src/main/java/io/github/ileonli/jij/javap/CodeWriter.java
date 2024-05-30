@@ -5,6 +5,9 @@ import io.github.ileonli.jij.classfile.attribute.CodeAttribute;
 import io.github.ileonli.jij.classfile.attribute.LineNumberTableAttribute;
 import io.github.ileonli.jij.classfile.attribute.LocalVariableTableAttribute;
 import io.github.ileonli.jij.classfile.attribute.StackMapTableAttribute;
+import io.github.ileonli.jij.classfile.visitor.DefaultConstantPoolVisitor;
+import io.github.ileonli.jij.classfile.visitor.DefaultInstructionVisitor;
+import io.github.ileonli.jij.classfile.visitor.DefaultStackMapFrameVisitor;
 
 import java.util.List;
 

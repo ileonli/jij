@@ -20,7 +20,7 @@ public abstract class ConstantPoolInfo {
         return n.replace("Constant", "").replace("Info", "");
     }
 
-    String tagName() {
+    public String tagName() {
         int tag = getTag();
         return switch (tag) {
             case ConstantPool.CONSTANT_Utf8 -> "Utf8";
